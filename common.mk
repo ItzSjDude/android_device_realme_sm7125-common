@@ -675,5 +675,4 @@ PRODUCT_PACKAGES += \
     android.system.wifi.keystore@1.0.vendor \
     libadf.vendor \
     libstdc++_vendor \
-    vendor.qti.hardware.camera.device@1.0.vendor \
-    libtinyxml.vendor
+    vendor.qti.hardware.camera.device@1.0.vendor 
