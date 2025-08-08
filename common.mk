@@ -16,10 +16,6 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
 # Partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
-# Get custom stuff
-$(call inherit-product-if-exists, vendor/hotword/google.mk)
-$(call inherit-product-if-exists, packages/apps/RealmeDirac/dirac.mk)
-
 # AID/fs configs
 PRODUCT_PACKAGES += \
     fs_config_files
