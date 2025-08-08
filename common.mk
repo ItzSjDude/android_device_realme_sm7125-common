@@ -65,13 +65,11 @@ PRODUCT_COPY_FILES += \
 
 # Bluetooth
 PRODUCT_PACKAGES += \
-    audio.bluetooth.default \
-    libbthost_if
+    audio.bluetooth.default 
 
 PRODUCT_PACKAGES += \
     android.hardware.bluetooth.audio-impl \
     libldacBT_abr \
-    libldacBT_bco \
     libldacBT_enc \
     vendor.qti.hardware.btconfigstore@1.0.vendor \
     vendor.qti.hardware.btconfigstore@2.0.vendor
@@ -110,7 +108,6 @@ PRODUCT_PACKAGES += \
     gralloc.atoll \
     hwcomposer.atoll \
     libdisplayconfig.qti \
-    libdisplayconfig.qti.vendor \
     libqdMetaData \
     libtinyxml \
     libgui_vendor \
@@ -261,7 +258,6 @@ PRODUCT_PACKAGES += \
     libOmxQcelp13Enc \
     libOmxVdec \
     libOmxVenc \
-    libOmxSwVdec \
     libOmxVidcCommon \
     libstagefrighthw
 
@@ -511,7 +507,6 @@ PRODUCT_PACKAGES += \
     android.frameworks.cameraservice.service@2.1.vendor \
     android.frameworks.displayservice@1.0.vendor \
     android.frameworks.schedulerservice@1.0.vendor \
-    android.frameworks.serservice@1.0.vendor \
     android.frameworks.stats@1.0.vendor \
     android.hardware.atrace@1.0.vendor \
     android.hardware.audio.common@4.0.vendor \
@@ -629,19 +624,12 @@ PRODUCT_PACKAGES += \
     android.hardware.secure_element@1.0.vendor \
     android.hardware.secure_element@1.1.vendor \
     android.hardware.secure_element@1.2.vendor \
-    android.hardware.sers@1.0.vendor \
-    android.hardware.sers@2.0.vendor \
-    android.hardware.sers@2.1.vendor \
-    android.hardwareundtrigger@2.1.vendor \
-    android.hardwareundtrigger@2.2.vendor \
-    android.hardwareundtrigger@2.3.vendor \
     android.hardware.tetheroffload.config@1.0.vendor \
     android.hardware.tetheroffload.control@1.0.vendor \
     android.hardware.thermal@1.0.vendor \
     android.hardware.thermal@1.1.vendor \
     android.hardware.thermal@2.0.vendor \
     android.hardware.tv.cec@1.0.vendor \
-    android.hardware.tv.cec@2.0.vendor \
     android.hardware.tv.input@1.0.vendor \
     android.hardware.tv.tuner@1.0.vendor \
     android.hardware.usb.gadget@1.0.vendor \
@@ -658,7 +646,6 @@ PRODUCT_PACKAGES += \
     android.hardware.wifi.hostapd@1.0.vendor \
     android.hardware.wifi.hostapd@1.1.vendor \
     android.hardware.wifi.hostapd@1.2.vendor \
-    android.hardware.wifi.offload@1.0.vendor \
     android.hardware.wifi.supplicant@1.0.vendor \
     android.hardware.wifi.supplicant@1.1.vendor \
     android.hardware.wifi.supplicant@1.2.vendor \
@@ -673,6 +660,5 @@ PRODUCT_PACKAGES += \
     android.system.net.netd@1.0.vendor \
     android.system.net.netd@1.1.vendor \
     android.system.wifi.keystore@1.0.vendor \
-    libadf.vendor \
     libstdc++_vendor \
     vendor.qti.hardware.camera.device@1.0.vendor 
