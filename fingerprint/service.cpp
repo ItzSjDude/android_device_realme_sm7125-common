@@ -41,7 +41,6 @@ int main() {
         goto shutdown;
     }
 
-    android::hardware::setMinSchedulerPolicy(biometricsFingerprint, SCHED_RR, -20);
     configureRpcThreadpool(1, true /*callerWillJoin*/);
 
     status = biometricsFingerprint->registerAsService();
