@@ -1,0 +1,125 @@
+name: Build Fingerprint HAL
+
+on:
+  push:
+    paths:
+      - 'fingerprint/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout device tree
+        uses: actions/checkout@v4
+        with:
+          path: device-tree
+      
+      - name: Setup build environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc bison build-essential ccache curl flex \
+            g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev \
+            lib32readline-dev lib32z1-dev liblz4-tool libncurses5 libncurses5-dev \
+            libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush \
+            rsync schedtool squashfs-tools xsltproc zip zlib1g-dev \
+            libc6-dev-i386 libx11-dev lib32z-dev libgl1-mesa-dev
+          
+          # Install repo tool
+          sudo curl --create-dirs -L -o /usr/local/bin/repo \
+            https://storage.googleapis.com/git-repo-downloads/repo
+          sudo chmod a+rx /usr/local/bin/repo
+          
+          # Configure git
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git config --global color.ui false
+      
+      - name: Initialize repo
+        run: |
+          mkdir -p ~/android/lineage
+          cd ~/android/lineage
+          repo init -u https://github.com/LineageOS/android.git -b lineage-23.0 --depth=1 --git-lfs
+        
+      - name: Sync minimal source
+        run: |
+          cd ~/android/lineage
+          repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags \
+            build/make \
+            build/soong \
+            build/blueprint \
+            system/core \
+            system/libhidl \
+            system/tools/hidl \
+            hardware/interfaces \
+            frameworks/native \
+            frameworks/av \
+            external/libcxx \
+            external/libcxxabi \
+            prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 \
+            prebuilts/clang/host/linux-x86 \
+            prebuilts/build-tools
+      
+      - name: Setup device tree
+        run: |
+          mkdir -p ~/android/lineage/device/realme
+          cp -r device-tree ~/android/lineage/device/realme/sm7125-common
+          
+          # Create minimal device makefile if needed
+          if [ ! -f ~/android/lineage/device/realme/sm7125-common/AndroidProducts.mk ]; then
+            echo "PRODUCT_MAKEFILES := \\" > ~/android/lineage/device/realme/sm7125-common/AndroidProducts.mk
+            echo "    \$(LOCAL_DIR)/lineage_salaa.mk" >> ~/android/lineage/device/realme/sm7125-common/AndroidProducts.mk
+          fi
+      
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: lineage-fingerprint
+          max-size: 2G
+      
+      - name: Build fingerprint HAL
+        run: |
+          cd ~/android/lineage
+          export USE_CCACHE=1
+          export CCACHE_EXEC=/usr/bin/ccache
+          
+          source build/envsetup.sh
+          
+          # Use generic target for module build
+          lunch aosp_arm64-eng
+          
+          # Build only fingerprint module
+          mmm device/realme/sm7125-common/fingerprint
+      
+      - name: Prepare upload
+        run: |
+          mkdir -p ~/upload
+          
+          # Find compiled binary
+          BINARY=$(find ~/android/lineage/out -name "android.hardware.biometrics.fingerprint@2.3-service.sm7125" -type f 2>/dev/null | head -n1)
+          
+          if [ -n "$BINARY" ]; then
+            cp "$BINARY" ~/upload/
+            echo "Binary found and copied: $BINARY"
+            ls -lh ~/upload/
+          else
+            echo "Binary not found! Checking build output..."
+            find ~/android/lineage/out -name "*fingerprint*" -type f
+            exit 1
+          fi
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fingerprint-hal-android16
+          path: ~/upload/*
+          if-no-files-found: error
+      
+      - name: Build summary
+        run: |
+          echo "## Build Information" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: lineage-23.0 (Android 16)" >> $GITHUB_STEP_SUMMARY
+          echo "- Device: Realme 7 Pro (RMX2170/salaa)" >> $GITHUB_STEP_SUMMARY
+          echo "- Module: android.hardware.biometrics.fingerprint@2.3-service.sm7125" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
